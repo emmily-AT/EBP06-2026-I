@@ -4,7 +4,7 @@ import com.tuapp.finanzas.auth.dto.AuthResponse;
 import com.tuapp.finanzas.auth.dto.LoginRequest;
 import com.tuapp.finanzas.user.dto.CreateUserRequest;
 import com.tuapp.finanzas.user.dto.UserDto;
-import com.tuapp.finanzas.user.repository.UserRepository;
+import com.tuapp.finanzas.user.service.UserLookup;
 import com.tuapp.finanzas.user.service.UserService;
 import com.tuapp.finanzas.auth.service.JwtService;
 import jakarta.validation.Valid;
@@ -22,12 +22,12 @@ import org.springframework.security.core.context.SecurityContextHolder;
 public class AuthController {
 
     private final UserService userService;
-    private final UserRepository userRepository;
+    private final UserLookup userRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private static final Logger logger = LoggerFactory.getLogger(AuthController.class);
 
-    public AuthController(UserService userService, UserRepository userRepository, PasswordEncoder passwordEncoder, JwtService jwtService) {
+    public AuthController(UserService userService, UserLookup userRepository, PasswordEncoder passwordEncoder, JwtService jwtService) {
         this.userService = userService;
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;

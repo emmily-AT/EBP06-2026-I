@@ -6,7 +6,7 @@ import com.tuapp.finanzas.transaction.repository.TransactionRepository;
 import com.tuapp.finanzas.transaction.service.TransactionService;
 import com.tuapp.finanzas.category.entity.Category;
 import com.tuapp.finanzas.user.entity.User;
-import com.tuapp.finanzas.user.repository.UserRepository;
+import com.tuapp.finanzas.user.service.UserLookup;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
@@ -17,11 +17,11 @@ import java.util.stream.Collectors;
 public class TransactionServiceImpl implements TransactionService {
 
     private final TransactionRepository transactionRepository;
-    private final UserRepository userRepository;
+    private final UserLookup userLookup;
 
-    public TransactionServiceImpl(TransactionRepository transactionRepository, UserRepository userRepository) {
+    public TransactionServiceImpl(TransactionRepository transactionRepository, UserLookup userLookup) {
         this.transactionRepository = transactionRepository;
-        this.userRepository = userRepository;
+        this.userLookup = userLookup;
     }
 
     @Override
@@ -48,7 +48,7 @@ public class TransactionServiceImpl implements TransactionService {
             // try to resolve current user from security context if available
             var auth = SecurityContextHolder.getContext().getAuthentication();
             if (auth != null && auth.getName() != null) {
-                userRepository.findByUsername(auth.getName()).ifPresent(t::setUser);
+                userLookup.findByUsername(auth.getName()).ifPresent(t::setUser);
             }
         }
         Transaction saved = transactionRepository.save(t);

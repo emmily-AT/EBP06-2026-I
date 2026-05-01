@@ -2,7 +2,7 @@ package com.tuapp.finanzas.auth.filter;
 
 import com.tuapp.finanzas.auth.service.JwtService;
 import com.tuapp.finanzas.user.entity.User;
-import com.tuapp.finanzas.user.repository.UserRepository;
+import com.tuapp.finanzas.user.service.UserLookup;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -21,11 +21,11 @@ import java.util.Collections;
 public class JwtAuthFilter extends OncePerRequestFilter {
 
     private final JwtService jwtService;
-    private final UserRepository userRepository;
+    private final UserLookup userLookup;
 
-    public JwtAuthFilter(JwtService jwtService, UserRepository userRepository) {
+    public JwtAuthFilter(JwtService jwtService, UserLookup userLookup) {
         this.jwtService = jwtService;
-        this.userRepository = userRepository;
+        this.userLookup = userLookup;
     }
 
     @Override
@@ -35,7 +35,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             String token = header.substring(7);
             String username = jwtService.extractSubject(token);
             if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-                User user = userRepository.findByUsername(username).orElse(null);
+                User user = userLookup.findByUsername(username).orElse(null);
                 if (user != null) {
                     // For now, a single ROLE_USER authority
                     UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(
