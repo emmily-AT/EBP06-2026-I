@@ -33,4 +33,14 @@ public class TransactionController {
     public ResponseEntity<TransactionDto> create(@Valid @RequestBody TransactionDto dto) {
         return ResponseEntity.ok(transactionService.create(dto));
     }
+
+    @PostMapping("/expense")
+    public ResponseEntity<TransactionDto> createExpense(@RequestBody TransactionDto dto) {
+        return ResponseEntity.ok(transactionService.createExpense(dto));
+    }
+
+    @GetMapping("/balance")
+    public ResponseEntity<Double> getBalance() {
+        return ResponseEntity.ok(transactionService.getBalance());
+    }
 }

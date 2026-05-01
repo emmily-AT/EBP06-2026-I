@@ -2,6 +2,7 @@ package com.tuapp.finanzas.transaction.service.impl;
 
 import com.tuapp.finanzas.transaction.dto.TransactionDto;
 import com.tuapp.finanzas.transaction.entity.Transaction;
+import com.tuapp.finanzas.transaction.entity.Transaction.TransactionType;
 import com.tuapp.finanzas.transaction.repository.TransactionRepository;
 import com.tuapp.finanzas.transaction.service.TransactionService;
 import com.tuapp.finanzas.category.entity.Category;
@@ -23,9 +24,7 @@ public class TransactionServiceImpl implements TransactionService {
         this.transactionRepository = transactionRepository;
         this.userLookup = userLookup;
     }
-
-    @Override
-    public TransactionDto create(TransactionDto dto) {
+    private Transaction buildTransaction(TransactionDto dto) {
         Transaction t = new Transaction();
         t.setAmount(dto.getAmount());
         // set date explicitly: JPA may include a null date in INSERT which prevents DB default from applying
@@ -51,10 +50,39 @@ public class TransactionServiceImpl implements TransactionService {
                 userLookup.findByUsername(auth.getName()).ifPresent(t::setUser);
             }
         }
-        Transaction saved = transactionRepository.save(t);
-        return toDto(saved);
+        return t;
     }
 
+    @Override
+    public TransactionDto create(TransactionDto dto) {
+        Transaction t = buildTransaction(dto);
+        t.setType(TransactionType.INCOME);
+        return toDto(transactionRepository.save(t));
+    }
+    
+    @Override
+    public TransactionDto createExpense(TransactionDto dto) {
+        Transaction t = buildTransaction(dto);
+        t.setType(TransactionType.EXPENSE);
+        return toDto(transactionRepository.save(t));
+    }
+
+    @Override
+    public Double getBalance() {
+        var auth = SecurityContextHolder.getContext().getAuthentication();
+
+        if (auth == null || auth.getName() == null) {
+            throw new RuntimeException("Usuario no autenticado");
+        }
+
+        User user = userRepository.findByUsername(auth.getName())
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+
+        Double income = transactionRepository.sumByTypeAndUser(TransactionType.INCOME, user.getId());
+        Double expense = transactionRepository.sumByTypeAndUser(TransactionType.EXPENSE, user.getId());
+
+        return income - expense;
+    }
     @Override
     public List<TransactionDto> findAll() {
         return transactionRepository.findAll().stream().map(this::toDto).collect(Collectors.toList());

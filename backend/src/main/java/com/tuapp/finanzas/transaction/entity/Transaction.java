@@ -21,6 +21,9 @@ public class Transaction {
 
     private String description;
 
+    @Enumerated(EnumType.STRING)
+    private TransactionType type;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id")
     private Category category;
@@ -29,6 +32,10 @@ public class Transaction {
     @JoinColumn(name = "user_id")
     private User user;
 
+    public enum TransactionType {
+    INCOME,
+    EXPENSE
+    }
     public Transaction() {}
 
     public Transaction(Long id, java.math.BigDecimal amount, String description, Category category, User user, java.time.OffsetDateTime date) {
@@ -70,6 +77,14 @@ public class Transaction {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public TransactionType getType() {
+        return type;
+    }
+
+    public void setType(TransactionType type) {
+        this.type = type;
     }
 
     public Category getCategory() {
