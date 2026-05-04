@@ -5,6 +5,8 @@ import { format } from "date-fns";
 import { es } from "date-fns/locale";
 import { Calendar } from "./ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
+import { transactionService } from '../api/transactionService';
+import { incomeCategoryToDbId } from '../api/categories';
 
 const categories = [
   { id: 'salary', name: 'Salario', icon: Briefcase, color: 'bg-blue-100 text-blue-600' },
@@ -73,21 +75,15 @@ export function Income({ onBack }: IncomeProps) {
       setSavedCategoryName(categoryName);
       setSavedAmount(amount);
 
-      // Save income to localStorage
-      const newIncome = {
-        id: Math.random().toString(36).substr(2, 9),
-        date: date ? format(date, 'yyyy-MM-dd') : '',
-        createdAt: new Date().toISOString(),
-        categoryId: selectedCategory,
-        categoryName,
-        description,
-        amount,
-        userId: user?.id || ''
-      };
+      const numericAmount = parseInt(amount.replace(/[^\d]/g, ''));
+      const categoryId = incomeCategoryToDbId[selectedCategory] || undefined;
 
-      const existingIncomes = JSON.parse(localStorage.getItem('incomes') || '[]');
-      existingIncomes.push(newIncome);
-      localStorage.setItem('incomes', JSON.stringify(existingIncomes));
+      transactionService.createIncome({
+        amount: numericAmount,
+        description: description || categoryName,
+        categoryId,
+        date: date ? date.toISOString() : undefined,
+      }).catch(console.error);
 
       setShowToast(true);
 

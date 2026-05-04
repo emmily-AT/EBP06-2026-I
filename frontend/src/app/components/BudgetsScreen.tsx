@@ -3,6 +3,9 @@ import { SidebarLayout } from './SidebarLayout';
 import { useAuth } from '../contexts/AuthContext';
 import { useNotifications } from '../contexts/NotificationContext';
 import { useState, useEffect } from 'react';
+import { budgetService } from '../api/budgetService';
+import { transactionService } from '../api/transactionService';
+import { dbIdToCategory } from '../api/categories';
 
 const categoryIcons = {
   'food': ShoppingCart,
@@ -32,12 +35,12 @@ const months = [
 ];
 
 interface Budget {
-  id: string;
-  categoryId: string;
-  categoryName: string;
-  amount: string;
-  month: number;
-  userId: string;
+  id: number;
+  name: string;
+  limitAmount: number;
+  month: number | null;
+  year: number | null;
+  categoryId: number | null;
 }
 
 interface BudgetsScreenProps {
@@ -47,7 +50,6 @@ interface BudgetsScreenProps {
 }
 
 export function BudgetsScreen({ onNavigate, onCreateBudget, onProfileClick }: BudgetsScreenProps) {
-  const { user } = useAuth();
   const { addNotification } = useNotifications();
   const [budgets, setBudgets] = useState<Budget[]>([]);
   const [expenses, setExpenses] = useState<any[]>([]);
@@ -68,16 +70,16 @@ export function BudgetsScreen({ onNavigate, onCreateBudget, onProfileClick }: Bu
   };
 
   useEffect(() => {
-    if (user) {
-      const allBudgets = JSON.parse(localStorage.getItem('budgets') || '[]');
-      const userBudgets = allBudgets.filter((b: Budget) => b.userId === user.id);
-      setBudgets(userBudgets);
-
-      const allExpenses = JSON.parse(localStorage.getItem('expenses') || '[]');
-      const userExpenses = allExpenses.filter((e: any) => e.userId === user.id);
-      setExpenses(userExpenses);
-    }
-  }, [user]);
+    Promise.all([
+      budgetService.getBudgets(),
+      transactionService.getTransactions(),
+    ])
+      .then(([budgetsRes, txRes]) => {
+        setBudgets(budgetsRes.data);
+        setExpenses(txRes.data.filter((tx: any) => tx.type === 'EXPENSE'));
+      })
+      .catch(console.error);
+  }, []);
 
   // Check for budget alerts (80% threshold)
   useEffect(() => {
@@ -85,29 +87,31 @@ export function BudgetsScreen({ onNavigate, onCreateBudget, onProfileClick }: Bu
       const notifiedBudgets = getNotifiedBudgets();
 
       budgets.forEach((budget) => {
-        const amountNum = parseInt(budget.amount.replace(/[^\d]/g, ''));
+        const amountNum = budget.limitAmount;
 
         // Calculate spent amount for this budget
         const categoryExpenses = expenses.filter((expense) => {
-          const expenseDate = new Date(expense.date);
-          const expenseMonth = expenseDate.getMonth();
-          return expense.categoryId === budget.categoryId && expenseMonth === budget.month;
+          if (expense.categoryId !== budget.categoryId) return false;
+          if (budget.month != null) {
+            const expenseMonth = new Date(expense.date).getMonth() + 1;
+            return expenseMonth === budget.month;
+          }
+          return true;
         });
 
         const spentAmount = categoryExpenses.reduce((total, expense) => {
-          const expenseAmount = parseInt(expense.amount.replace(/[^\d]/g, ''));
-          return total + expenseAmount;
+          return total + expense.amount;
         }, 0);
 
         const spentPercentage = amountNum > 0 ? Math.round((spentAmount / amountNum) * 100) : 0;
 
         // Trigger notification at 80% or more, but only once per budget (persisted in localStorage)
-        const budgetKey = `${budget.id}-${budget.month}-${budget.userId}`;
+        const budgetKey = `${budget.id}-${budget.month}`;
         if (spentPercentage >= 80 && !notifiedBudgets.has(budgetKey)) {
           addNotification({
-            message: `Has alcanzado el ${spentPercentage}% de tu presupuesto en ${budget.categoryName}`,
+            message: `Has alcanzado el ${spentPercentage}% de tu presupuesto en ${budget.name}`,
             type: 'budget_alert',
-            category: budget.categoryName,
+            category: budget.name,
           });
           saveNotifiedBudget(budgetKey);
         }
@@ -151,20 +155,23 @@ export function BudgetsScreen({ onNavigate, onCreateBudget, onProfileClick }: Bu
           {budgets.length > 0 && (
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 md:gap-5">
               {budgets.map((budget) => {
-                const Icon = categoryIcons[budget.categoryId as keyof typeof categoryIcons] || Wallet;
-                const color = categoryColors[budget.categoryId as keyof typeof categoryColors] || 'bg-slate-100 text-slate-600';
-                const amountNum = parseInt(budget.amount.replace(/[^\d]/g, ''));
+                const categoryKey = budget.categoryId ? dbIdToCategory[budget.categoryId] : undefined;
+                const Icon = categoryKey ? categoryIcons[categoryKey as keyof typeof categoryIcons] || Wallet : Wallet;
+                const color = categoryKey ? categoryColors[categoryKey as keyof typeof categoryColors] || 'bg-slate-100 text-slate-600' : 'bg-slate-100 text-slate-600';
+                const amountNum = budget.limitAmount;
 
                 // Calculate spent amount from expenses
                 const categoryExpenses = expenses.filter((expense) => {
-                  const expenseDate = new Date(expense.date);
-                  const expenseMonth = expenseDate.getMonth();
-                  return expense.categoryId === budget.categoryId && expenseMonth === budget.month;
+                  if (expense.categoryId !== budget.categoryId) return false;
+                  if (budget.month != null) {
+                    const expenseMonth = new Date(expense.date).getMonth() + 1;
+                    return expenseMonth === budget.month;
+                  }
+                  return true;
                 });
 
                 const spentAmount = categoryExpenses.reduce((total, expense) => {
-                  const expenseAmount = parseInt(expense.amount.replace(/[^\d]/g, ''));
-                  return total + expenseAmount;
+                  return total + expense.amount;
                 }, 0);
 
                 const spentPercentage = amountNum > 0 ? Math.round((spentAmount / amountNum) * 100) : 0;
@@ -196,8 +203,8 @@ export function BudgetsScreen({ onNavigate, onCreateBudget, onProfileClick }: Bu
                         <Icon className="w-6 h-6" strokeWidth={2} />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-slate-900 font-medium truncate">{budget.categoryName}</p>
-                        <p className="text-sm text-slate-500">{months[budget.month]}</p>
+                        <p className="text-slate-900 font-medium truncate">{budget.name}</p>
+                        <p className="text-sm text-slate-500">{budget.month != null ? months[budget.month - 1] : ''}</p>
                       </div>
                       <span className={`text-xs px-2 py-1 rounded-lg flex-shrink-0 ${statusClass}`}>
                         {statusText}
