@@ -7,5 +7,6 @@ import java.util.List;
 public interface BudgetService {
     BudgetDto create(BudgetDto dto);
     List<BudgetDto> findAll();
+    List<BudgetDto> findByUserId(Long userId);
     BudgetDto findById(Long id);
 }

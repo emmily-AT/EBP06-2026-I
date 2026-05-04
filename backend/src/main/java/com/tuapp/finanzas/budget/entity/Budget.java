@@ -18,7 +18,9 @@ public class Budget {
     @Column(name = "limit_amount")
     private BigDecimal limitAmount;
 
+    @Column(name = "\"month\"")
     private Integer month;
+    @Column(name = "\"year\"")
     private Integer year;
 
     @ManyToOne
