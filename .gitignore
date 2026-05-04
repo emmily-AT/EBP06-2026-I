@@ -21,6 +21,7 @@ Desktop.ini
 *.sln
 *.sw?
 out/
+.claude/**
 
 # ========================
 # Java / Maven
