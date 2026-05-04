@@ -4,7 +4,9 @@ import com.tuapp.finanzas.user.dto.CreateUserRequest;
 import com.tuapp.finanzas.user.dto.UserDto;
 import com.tuapp.finanzas.user.dto.UserSessionDto;
 import com.tuapp.finanzas.user.service.UserService;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import jakarta.validation.Valid;
@@ -22,28 +24,27 @@ public class UserController {
 
     @GetMapping("/me")
     public ResponseEntity<UserDto> getMyProfile() {
-        // In a real app, username would be extracted from the SecurityContext
-        String currentUsername = "testuser"; 
+        String currentUsername = SecurityContextHolder.getContext().getAuthentication().getName();
         return ResponseEntity.ok(userService.getProfile(currentUsername));
     }
 
     @PutMapping("/password")
     public ResponseEntity<Void> updatePassword(@RequestBody PasswordUpdateRequest req) {
-        String currentUsername = "testuser";
+        String currentUsername = SecurityContextHolder.getContext().getAuthentication().getName();
         userService.updatePassword(currentUsername, req.getCurrentPassword(), req.getNewPassword());
         return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/sessions")
     public ResponseEntity<List<UserSessionDto>> getSessions() {
-        String currentUsername = "testuser";
+        String currentUsername = SecurityContextHolder.getContext().getAuthentication().getName();
         return ResponseEntity.ok(userService.getActiveSessions(currentUsername));
     }
 
     @DeleteMapping("/sessions")
-    public ResponseEntity<Void> terminateOtherSessions() {
-        String currentUsername = "testuser";
-        String currentToken = "fake-token";
+    public ResponseEntity<Void> terminateOtherSessions(HttpServletRequest request) {
+        String currentUsername = SecurityContextHolder.getContext().getAuthentication().getName();
+        String currentToken = request.getHeader("Authorization").replace("Bearer ", "");
         userService.terminateOtherSessions(currentUsername, currentToken);
         return ResponseEntity.noContent().build();
     }

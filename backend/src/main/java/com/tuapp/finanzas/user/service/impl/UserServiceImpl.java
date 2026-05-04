@@ -37,6 +37,7 @@ public class UserServiceImpl implements UserService {
     public UserDto create(CreateUserRequest req) {
         User u = new User();
         u.setUsername(req.getUsername());
+        u.setEmail(req.getEmail());
         u.setPassword(passwordEncoder.encode(req.getPassword()));
         u.setFullName(req.getFullName());
         User saved = userRepository.save(u);
