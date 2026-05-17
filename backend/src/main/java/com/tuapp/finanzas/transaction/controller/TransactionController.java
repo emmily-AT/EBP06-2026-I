@@ -2,8 +2,9 @@
 package com.tuapp.finanzas.transaction.controller;
 
 import com.tuapp.finanzas.transaction.dto.TransactionDto;
-import com.tuapp.finanzas.transaction.facade.ExpenseFacade;
+import com.tuapp.finanzas.transaction.entity.Transaction.TransactionType;
 import com.tuapp.finanzas.transaction.service.TransactionService;
+import com.tuapp.finanzas.transaction.strategy.TransactionProcessor;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -15,12 +16,12 @@ import java.util.List;
 public class TransactionController {
 
     private final TransactionService transactionService;
-    private final ExpenseFacade expenseFacade; // ✅ inyectamos el facade
+    private final TransactionProcessor transactionProcessor;
 
     public TransactionController(TransactionService transactionService,
-                                 ExpenseFacade expenseFacade) {
+                                 TransactionProcessor transactionProcessor) {
         this.transactionService = transactionService;
-        this.expenseFacade = expenseFacade;
+        this.transactionProcessor = transactionProcessor;
     }
 
     @GetMapping
@@ -35,14 +36,27 @@ public class TransactionController {
     }
 
     @PostMapping
-    public ResponseEntity<TransactionDto> create(@Valid @RequestBody TransactionDto dto) {
-        return ResponseEntity.ok(transactionService.create(dto));
-    }
+    public ResponseEntity<TransactionDto> create(
+        @RequestBody TransactionDto dto) {
+
+    return ResponseEntity.ok(
+            transactionProcessor.process(
+                    TransactionType.INCOME,
+                    dto
+            )
+    );
+}
 
     @PostMapping("/expense")
-    public ResponseEntity<TransactionDto> createExpense(@RequestBody TransactionDto dto) {
-        // ✅ El controlador delega al facade — no sabe nada de alertas
-        return ResponseEntity.ok(expenseFacade.registerExpense(dto));
+    public ResponseEntity<TransactionDto> createExpense(
+            @RequestBody TransactionDto dto) {
+
+        return ResponseEntity.ok(
+                transactionProcessor.process(
+                        TransactionType.EXPENSE,
+                        dto
+                )
+        );
     }
 
     @GetMapping("/balance")
