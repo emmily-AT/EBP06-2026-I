@@ -5,10 +5,10 @@ import com.tuapp.finanzas.transaction.dto.TransactionDto;
 import com.tuapp.finanzas.transaction.entity.Transaction.TransactionType;
 import com.tuapp.finanzas.transaction.service.TransactionService;
 import com.tuapp.finanzas.transaction.strategy.TransactionProcessor;
-import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @RestController
@@ -59,8 +59,26 @@ public class TransactionController {
         );
     }
 
+    @PutMapping("/{id}")
+    public ResponseEntity<TransactionDto> update(
+            @PathVariable Long id,
+            @RequestBody TransactionDto dto) {
+
+        return ResponseEntity.ok(
+                transactionService.update(id, dto)
+        );
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> delete(@PathVariable Long id) {
+
+        transactionService.delete(id);
+
+        return ResponseEntity.noContent().build();
+    }
+
     @GetMapping("/balance")
-    public ResponseEntity<Double> getBalance() {
+    public ResponseEntity<BigDecimal> getBalance() {
         return ResponseEntity.ok(transactionService.getBalance());
     }
 }

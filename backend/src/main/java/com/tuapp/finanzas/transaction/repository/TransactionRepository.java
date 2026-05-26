@@ -2,9 +2,12 @@ package com.tuapp.finanzas.transaction.repository;
 
 import com.tuapp.finanzas.transaction.entity.Transaction;
 import com.tuapp.finanzas.transaction.entity.Transaction.TransactionType;
+import java.math.BigDecimal;
+import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 @Repository
@@ -51,4 +54,14 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
     ORDER BY MONTH(t.date)
     """)
     List<Object[]> getYearlyBalance(Long userId, int year);
+
+    @Query("""
+    SELECT COALESCE(SUM(t.amount), 0)
+    FROM Transaction t
+    WHERE t.user.id = :id
+    AND t.type = :type
+    """)
+    BigDecimal sumByTypeAndUser(TransactionType type, Long id);
+
+
 }

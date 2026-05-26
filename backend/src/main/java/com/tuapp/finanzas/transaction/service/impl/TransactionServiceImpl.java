@@ -13,6 +13,7 @@ import com.tuapp.finanzas.user.service.UserLookup;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -55,6 +56,19 @@ public class TransactionServiceImpl implements TransactionService {
 
         return null;
     }
+
+    private User getCurrentUser() {
+
+    var auth = SecurityContextHolder.getContext().getAuthentication();
+
+    if (auth == null || auth.getName() == null) {
+        throw new RuntimeException("Usuario no autenticado");
+    }
+
+    return userLookup.findByUsername(auth.getName())
+            .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+    }
+
     @Override
     public TransactionDto create(TransactionDto dto) {
         User user = resolveUser(dto);
@@ -84,7 +98,52 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     @Override
-    public Double getBalance() {
+    public TransactionDto update(Long id, TransactionDto dto) {
+
+        Transaction transaction = transactionRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Transacción no encontrada"));
+
+        User currentUser = getCurrentUser();
+
+        if (!transaction.getUser().getId().equals(currentUser.getId())) {
+            throw new RuntimeException("No autorizado");
+        }
+
+        transaction.setAmount(dto.getAmount());
+        transaction.setDescription(dto.getDescription());
+
+        if (dto.getDate() != null) {
+            transaction.setDate(dto.getDate());
+        }
+
+        if (dto.getCategoryId() != null) {
+            Category category = new Category();
+            category.setId(dto.getCategoryId());
+            transaction.setCategory(category);
+        }
+
+        Transaction updated = transactionRepository.save(transaction);
+
+        return toDto(updated);
+    }
+
+    @Override
+    public void delete(Long id) {
+
+        Transaction transaction = transactionRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Transacción no encontrada"));
+
+        User currentUser = getCurrentUser();
+
+        if (!transaction.getUser().getId().equals(currentUser.getId())) {
+            throw new RuntimeException("No autorizado");
+        }
+
+        transactionRepository.delete(transaction);
+    }
+
+    @Override
+    public BigDecimal getBalance() {
         var auth = SecurityContextHolder.getContext().getAuthentication();
         if (auth == null || auth.getName() == null) {
             throw new RuntimeException("Usuario no autenticado");
@@ -92,12 +151,13 @@ public class TransactionServiceImpl implements TransactionService {
         User user = userLookup.findByUsername(auth.getName())
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
 
-        Double income = transactionRepository
+        BigDecimal income = transactionRepository
                 .sumByTypeAndUser(TransactionType.INCOME, user.getId());
-        Double expense = transactionRepository
+        BigDecimal expense = transactionRepository
                 .sumByTypeAndUser(TransactionType.EXPENSE, user.getId());
 
-        return (income != null ? income : 0.0) - (expense != null ? expense : 0.0);
+        return (income != null ? income : BigDecimal.ZERO)
+        .subtract(expense != null ? expense : BigDecimal.ZERO);
     }
 
     @Override
