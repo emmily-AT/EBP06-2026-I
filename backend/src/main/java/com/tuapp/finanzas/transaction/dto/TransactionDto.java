@@ -13,6 +13,7 @@ public class TransactionDto {
     private BigDecimal amount;
 
     private String description;
+    private String type;
     private Long categoryId;
     private Long userId;
     private OffsetDateTime date;
@@ -73,5 +74,13 @@ public class TransactionDto {
 
     public void setUserId(Long userId) {
         this.userId = userId;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
     }
 }

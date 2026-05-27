@@ -1,9 +1,13 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { authService } from '../api/authService';
 
 interface User {
-  id: string;
+  id: number;
+  username: string;
   email: string;
   name: string;
+  currency?: string;
+  role?: string;
 }
 
 interface AuthContextType {
@@ -21,50 +25,71 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const storedUser = localStorage.getItem('auth_user');
-    if (storedUser) {
-      setUser(JSON.parse(storedUser));
+    const token = localStorage.getItem('auth_token');
+    if (token) {
+      authService.getProfile()
+        .then(res => {
+          const data = res.data;
+          setUser({
+            id: data.id,
+            username: data.username,
+            email: data.email,
+            name: data.fullName,
+            currency: data.currency,
+            role: data.role,
+          });
+        })
+        .catch(() => {
+          localStorage.removeItem('auth_token');
+          localStorage.removeItem('auth_user');
+        })
+        .finally(() => setIsLoading(false));
+    } else {
+      setIsLoading(false);
     }
-    setIsLoading(false);
   }, []);
 
   const register = async (name: string, email: string, password: string) => {
-    const users = JSON.parse(localStorage.getItem('users') || '[]');
-
-    if (users.find((u: User & { password: string }) => u.email === email)) {
-      return { success: false, error: 'Este correo ya está registrado' };
+    try {
+      await authService.register(email, email, password, name);
+      return { success: true };
+    } catch (err: any) {
+      const msg = err.response?.data?.error || err.response?.data?.message || 'Error al crear la cuenta';
+      return { success: false, error: msg };
     }
-
-    const newUser = {
-      id: Math.random().toString(36).substr(2, 9),
-      name,
-      email,
-      password
-    };
-
-    users.push(newUser);
-    localStorage.setItem('users', JSON.stringify(users));
-
-    return { success: true };
   };
 
   const login = async (email: string, password: string) => {
-    const users = JSON.parse(localStorage.getItem('users') || '[]');
-    const user = users.find((u: User & { password: string }) => u.email === email && u.password === password);
+    try {
+      const res = await authService.login(email, password);
+      const { token, userId, username, fullName } = res.data;
 
-    if (!user) {
-      return { success: false, error: 'Correo o contraseña incorrectos' };
+      localStorage.setItem('auth_token', token);
+
+      // Fetch full profile after login
+      const profileRes = await authService.getProfile();
+      const data = profileRes.data;
+      const userData: User = {
+        id: data.id,
+        username: data.username,
+        email: data.email,
+        name: data.fullName,
+        currency: data.currency,
+        role: data.role,
+      };
+
+      setUser(userData);
+      localStorage.setItem('auth_user', JSON.stringify(userData));
+      return { success: true };
+    } catch (err: any) {
+      const msg = err.response?.data?.error || err.response?.data?.message || 'Correo o contraseña incorrectos';
+      return { success: false, error: msg };
     }
-
-    const userWithoutPassword = { id: user.id, email: user.email, name: user.name };
-    setUser(userWithoutPassword);
-    localStorage.setItem('auth_user', JSON.stringify(userWithoutPassword));
-
-    return { success: true };
   };
 
   const logout = () => {
     setUser(null);
+    localStorage.removeItem('auth_token');
     localStorage.removeItem('auth_user');
   };
 

@@ -1,3 +1,18 @@
+package com.tuapp.finanzas.alert.service.impl;
+
+import com.tuapp.finanzas.alert.entity.Alert;
+import com.tuapp.finanzas.alert.repository.AlertRepository;
+import com.tuapp.finanzas.budget.entity.Budget;
+import com.tuapp.finanzas.budget.repository.BudgetRepository;
+import com.tuapp.finanzas.transaction.repository.TransactionRepository;
+import com.tuapp.finanzas.alert.service.AlertService;
+import org.springframework.stereotype.Service;
+
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.time.LocalDateTime;
+import java.util.Optional;
+
 @Service
 public class AlertServiceImpl implements AlertService {
 
@@ -51,11 +66,19 @@ public class AlertServiceImpl implements AlertService {
 
     private void createAlert(Long userId, Long categoryId, BigDecimal percentage, String type) {
         Alert alert = new Alert();
-        alert.setMessage("Budget exceeded for category");
         alert.setPercentage(percentage);
         alert.setType(type);
         alert.setCreatedAt(LocalDateTime.now());
+        alert.setMessage("Budget threshold reached: " + percentage + "%");
 
+        // Attach user and category references minimally
+        com.tuapp.finanzas.user.entity.User u = new com.tuapp.finanzas.user.entity.User();
+        u.setId(userId);
+        alert.setUser(u);
+
+        com.tuapp.finanzas.category.entity.Category c = new com.tuapp.finanzas.category.entity.Category();
+        c.setId(categoryId);
+        alert.setCategory(c);
 
         alertRepository.save(alert);
     }

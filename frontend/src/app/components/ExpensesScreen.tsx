@@ -4,6 +4,8 @@ import { useAuth } from '../contexts/AuthContext';
 import { useState, useEffect } from 'react';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
+import { transactionService } from '../api/transactionService';
+import { dbIdToCategory } from '../api/categories';
 
 const categoryIcons = {
   'food': ShoppingCart,
@@ -28,13 +30,11 @@ const categoryColors = {
 };
 
 interface Expense {
-  id: string;
+  id: number;
   date: string;
-  categoryId: string;
-  categoryName: string;
+  categoryId: number | null;
   description: string;
-  amount: string;
-  userId: string;
+  amount: number;
 }
 
 interface ExpensesScreenProps {
@@ -48,18 +48,25 @@ export function ExpensesScreen({ onNavigate, onCreateExpense, onProfileClick }: 
   const [expenses, setExpenses] = useState<Expense[]>([]);
 
   useEffect(() => {
-    if (user) {
-      const allExpenses = JSON.parse(localStorage.getItem('expenses') || '[]');
-      const userExpenses = allExpenses.filter((e: Expense) => e.userId === user.id);
-      // Sort by date descending
-      userExpenses.sort((a: Expense, b: Expense) => new Date(b.date).getTime() - new Date(a.date).getTime());
-      setExpenses(userExpenses);
-    }
-  }, [user]);
+    transactionService.getTransactions()
+      .then(res => {
+        const expenses = res.data
+          .filter((tx: any) => tx.type === 'EXPENSE')
+          .map((tx: any) => ({
+            id: tx.id,
+            date: tx.date,
+            categoryId: tx.categoryId,
+            description: tx.description,
+            amount: tx.amount,
+          }));
+        setExpenses(expenses);
+      })
+      .catch(console.error);
+  }, []);
 
   // Calculate total expenses
   const totalExpenses = expenses.reduce((sum, expense) => {
-    return sum + parseInt(expense.amount.replace(/[^\d]/g, ''));
+    return sum + expense.amount;
   }, 0);
 
   const formatDate = (dateString: string) => {
@@ -109,8 +116,9 @@ export function ExpensesScreen({ onNavigate, onCreateExpense, onProfileClick }: 
           {expenses.length > 0 && (
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 md:gap-5">
               {expenses.map((expense) => {
-                const Icon = categoryIcons[expense.categoryId as keyof typeof categoryIcons] || Wallet;
-                const color = categoryColors[expense.categoryId as keyof typeof categoryColors] || 'bg-slate-100 text-slate-600';
+                const categoryKey = expense.categoryId ? dbIdToCategory[expense.categoryId] : undefined;
+                const Icon = categoryKey ? categoryIcons[categoryKey as keyof typeof categoryIcons] || Wallet : Wallet;
+                const color = categoryKey ? categoryColors[categoryKey as keyof typeof categoryColors] || 'bg-slate-100 text-slate-600' : 'bg-slate-100 text-slate-600';
 
                 return (
                   <div
@@ -123,18 +131,15 @@ export function ExpensesScreen({ onNavigate, onCreateExpense, onProfileClick }: 
                         <Icon className="w-6 h-6" strokeWidth={2} />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-slate-900 font-medium truncate">{expense.categoryName}</p>
+                        <p className="text-slate-900 font-medium truncate">{expense.description || 'Sin descripción'}</p>
                         <p className="text-sm text-slate-500">{formatDate(expense.date)}</p>
-                        {expense.description && (
-                          <p className="text-xs text-slate-400 mt-1 line-clamp-2">{expense.description}</p>
-                        )}
                       </div>
                     </div>
 
                     {/* Amount and Badge */}
                     <div className="flex items-center justify-between pt-3 border-t border-slate-100">
                       <span className="text-orange-600 font-medium text-lg">
-                        -${expense.amount}
+                        -${expense.amount.toLocaleString('es-ES')}
                       </span>
                       <span className="text-xs px-2 py-1 rounded-lg bg-orange-100 text-orange-700">
                         Gastado

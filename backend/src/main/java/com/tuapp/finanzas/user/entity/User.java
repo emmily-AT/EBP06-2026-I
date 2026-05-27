@@ -12,18 +12,29 @@ public class User {
     @Column(nullable = false, unique = true)
     private String username;
 
+    @Column(nullable = false, unique = true)
+    private String email;
+
     @Column(nullable = false)
     private String password;
 
     private String fullName;
+    // Force default currency to Colombian Peso (COP)
+    private String currency = "COP";
+    private String role = "USER";
+    private int failedPasswordChangeAttempts = 0;
+    private java.time.LocalDateTime passwordChangeLockoutUntil;
 
     public User() {}
 
-    public User(Long id, String username, String password, String fullName) {
+    public User(Long id, String username, String email, String password, String fullName, String currency, String role) {
         this.id = id;
         this.username = username;
+        this.email = email;
         this.password = password;
         this.fullName = fullName;
+        this.currency = currency;
+        this.role = role;
     }
 
     public Long getId() {
@@ -42,6 +53,14 @@ public class User {
         this.username = username;
     }
 
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
     public String getPassword() {
         return password;
     }
@@ -56,5 +75,37 @@ public class User {
 
     public void setFullName(String fullName) {
         this.fullName = fullName;
+    }
+
+    public String getCurrency() {
+        return currency;
+    }
+
+    public void setCurrency(String currency) {
+        this.currency = currency;
+    }
+
+    public String getRole() {
+        return role;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
+    }
+
+    public int getFailedPasswordChangeAttempts() {
+        return failedPasswordChangeAttempts;
+    }
+
+    public void setFailedPasswordChangeAttempts(int attempts) {
+        this.failedPasswordChangeAttempts = attempts;
+    }
+
+    public java.time.LocalDateTime getPasswordChangeLockoutUntil() {
+        return passwordChangeLockoutUntil;
+    }
+
+    public void setPasswordChangeLockoutUntil(java.time.LocalDateTime lockoutUntil) {
+        this.passwordChangeLockoutUntil = lockoutUntil;
     }
 }

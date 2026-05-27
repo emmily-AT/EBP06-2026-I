@@ -1,4 +1,3 @@
-// balance/controller/BalanceController.java
 package com.tuapp.finanzas.balance.controller;
 
 import com.tuapp.finanzas.balance.dto.MonthlyBalanceDto;

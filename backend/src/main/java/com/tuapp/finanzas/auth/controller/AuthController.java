@@ -43,7 +43,7 @@ public class AuthController {
         var opt = userRepository.findByUsername(auth.getName());
         if (opt.isPresent()) {
             var u = opt.get();
-            return ResponseEntity.ok(new UserDto(u.getId(), u.getUsername(), u.getFullName()));
+            return ResponseEntity.ok(new UserDto(u.getId(), u.getUsername(), u.getEmail(), u.getFullName(), u.getCurrency(), u.getRole()));
         }
         return ResponseEntity.status(org.springframework.http.HttpStatus.NOT_FOUND).body(java.util.Map.of("error", "User not found"));
     }

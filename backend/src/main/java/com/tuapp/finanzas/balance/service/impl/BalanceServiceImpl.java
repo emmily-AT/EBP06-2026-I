@@ -1,3 +1,15 @@
+package com.tuapp.finanzas.balance.service.impl;
+
+import com.tuapp.finanzas.balance.dto.MonthlyBalanceDto;
+import com.tuapp.finanzas.balance.dto.MonthlySummaryDto;
+import com.tuapp.finanzas.balance.dto.YearlyBalanceDto;
+import com.tuapp.finanzas.balance.service.BalanceService;
+import com.tuapp.finanzas.transaction.repository.TransactionRepository;
+import org.springframework.stereotype.Service;
+
+import java.math.BigDecimal;
+import java.util.List;
+
 @Service
 public class BalanceServiceImpl implements BalanceService {
 

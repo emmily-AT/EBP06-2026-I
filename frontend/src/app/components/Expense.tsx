@@ -5,6 +5,8 @@ import { format } from "date-fns";
 import { es } from "date-fns/locale";
 import { Calendar } from "./ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
+import { transactionService } from '../api/transactionService';
+import { categoryToDbId } from '../api/categories';
 
 const categories = [
   { id: 'food', name: 'Alimentación', icon: ShoppingCart, color: 'bg-orange-100 text-orange-600' },
@@ -73,21 +75,15 @@ export function Expense({ onBack }: ExpenseProps) {
       setSavedCategoryName(categoryName);
       setSavedAmount(amount);
 
-      // Save expense to localStorage
-      const newExpense = {
-        id: Math.random().toString(36).substr(2, 9),
-        date: date ? format(date, 'yyyy-MM-dd') : '',
-        createdAt: new Date().toISOString(),
-        categoryId: selectedCategory,
-        categoryName,
-        description,
-        amount,
-        userId: user?.id || ''
-      };
+      const numericAmount = parseInt(amount.replace(/[^\d]/g, ''));
+      const categoryId = categoryToDbId[selectedCategory] || undefined;
 
-      const existingExpenses = JSON.parse(localStorage.getItem('expenses') || '[]');
-      existingExpenses.push(newExpense);
-      localStorage.setItem('expenses', JSON.stringify(existingExpenses));
+      transactionService.createExpense({
+        amount: numericAmount,
+        description: description || categoryName,
+        categoryId,
+        date: date ? date.toISOString() : undefined,
+      }).catch(console.error);
 
       setShowToast(true);
 

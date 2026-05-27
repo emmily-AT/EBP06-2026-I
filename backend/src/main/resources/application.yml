@@ -10,11 +10,16 @@ spring:
       # Keep update for local dev, but in docker-compose we'll set ddl-auto to none and rely on Flyway
       ddl-auto: ${SPRING_JPA_HIBERNATE_DDL_AUTO:update}
     show-sql: ${SPRING_JPA_SHOW_SQL:true}
+    database-platform: ${SPRING_JPA_DATABASE_PLATFORM:org.hibernate.dialect.H2Dialect}
+    defer-datasource-initialization: true
   flyway:
     enabled: ${FLYWAY_ENABLED:false}
+  sql:
+    init:
+      mode: ${SPRING_SQL_INIT_MODE:embedded}
 
 server:
-  port: 8080
+  port: ${PORT:8080}
 
 jwt:
   # For dev only. Override with env var JWT_SECRET in production.

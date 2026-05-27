@@ -12,5 +12,6 @@ public interface TransactionService {
     void delete(Long id);
     BigDecimal getBalance();
     List<TransactionDto> findAll();
+    List<TransactionDto> findByUserId(Long userId);
     TransactionDto findById(Long id);
 }

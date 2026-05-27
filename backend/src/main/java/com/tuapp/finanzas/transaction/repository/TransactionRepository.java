@@ -9,6 +9,10 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+import org.springframework.data.repository.query.Param;
+
+import java.math.BigDecimal;
+import java.util.List;
 
 @Repository
 public interface TransactionRepository extends JpaRepository<Transaction, Long> {
@@ -29,6 +33,12 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
             @Param("month") int month
     );
 
+    @Query("""
+    SELECT COALESCE(SUM(t.amount), 0) FROM Transaction t
+    WHERE t.user.id = :userId
+    AND t.type = :type
+    """)
+    BigDecimal sumByTypeAndUser(@Param("type") TransactionType type, @Param("userId") Long userId);
 
     @Query("""
     SELECT 
@@ -40,7 +50,6 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
     AND MONTH(t.date) = :month
     """)
     Object[] getMonthlyBalance(Long userId, int year, int month);
-
 
     @Query("""
     SELECT 

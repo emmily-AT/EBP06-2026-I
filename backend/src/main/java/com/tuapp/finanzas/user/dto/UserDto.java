@@ -3,14 +3,20 @@ package com.tuapp.finanzas.user.dto;
 public class UserDto {
     private Long id;
     private String username;
+    private String email;
     private String fullName;
+    private String currency;
+    private String role;
 
     public UserDto() {}
 
-    public UserDto(Long id, String username, String fullName) {
+    public UserDto(Long id, String username, String email, String fullName, String currency, String role) {
         this.id = id;
         this.username = username;
+        this.email = email;
         this.fullName = fullName;
+        this.currency = currency;
+        this.role = role;
     }
 
     public Long getId() {
@@ -29,11 +35,35 @@ public class UserDto {
         this.username = username;
     }
 
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
     public String getFullName() {
         return fullName;
     }
 
     public void setFullName(String fullName) {
         this.fullName = fullName;
+    }
+
+    public String getCurrency() {
+        return currency;
+    }
+
+    public void setCurrency(String currency) {
+        this.currency = currency;
+    }
+
+    public String getRole() {
+        return role;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
     }
 }

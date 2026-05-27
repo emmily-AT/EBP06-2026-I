@@ -5,6 +5,8 @@ import { useAuth } from '../contexts/AuthContext';
 import { useState, useEffect } from 'react';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
+import { transactionService } from '../api/transactionService';
+import { dbIdToCategory } from '../api/categories';
 
 const categoryIcons: { [key: string]: any } = {
   // Expense categories
@@ -27,14 +29,12 @@ const categoryIcons: { [key: string]: any } = {
 };
 
 interface Transaction {
-  id: string;
+  id: number;
   date: string;
-  createdAt?: string;
-  categoryId: string;
-  categoryName: string;
+  categoryId: number | null;
   description: string;
-  amount: string;
-  type: 'income' | 'expense';
+  amount: number;
+  type: string;
 }
 
 interface DashboardHomeProps {
@@ -55,70 +55,34 @@ export function DashboardHome({ onNavigate, onCreateBudget, onCreateIncome, onCr
 
   useEffect(() => {
     if (user) {
-      const currentMonth = new Date().getMonth();
-      const currentYear = new Date().getFullYear();
+      transactionService.getTransactions()
+        .then(res => {
+          const currentMonth = new Date().getMonth();
+          const currentYear = new Date().getFullYear();
 
-      // Load incomes
-      const allIncomes = JSON.parse(localStorage.getItem('incomes') || '[]');
-      const userIncomes = allIncomes.filter((income: any) => {
-        const incomeDate = new Date(income.date);
-        if (viewMode === 'monthly') {
-          return income.userId === user.id &&
-                 incomeDate.getMonth() === currentMonth &&
-                 incomeDate.getFullYear() === currentYear;
-        } else {
-          return income.userId === user.id &&
-                 incomeDate.getFullYear() === currentYear;
-        }
-      });
+          const allTxs: Transaction[] = res.data;
+          const filtered = allTxs.filter((tx: Transaction) => {
+            const txDate = new Date(tx.date);
+            if (viewMode === 'monthly') {
+              return txDate.getMonth() === currentMonth && txDate.getFullYear() === currentYear;
+            } else {
+              return txDate.getFullYear() === currentYear;
+            }
+          });
 
-      // Load expenses
-      const allExpenses = JSON.parse(localStorage.getItem('expenses') || '[]');
-      const userExpenses = allExpenses.filter((expense: any) => {
-        const expenseDate = new Date(expense.date);
-        if (viewMode === 'monthly') {
-          return expense.userId === user.id &&
-                 expenseDate.getMonth() === currentMonth &&
-                 expenseDate.getFullYear() === currentYear;
-        } else {
-          return expense.userId === user.id &&
-                 expenseDate.getFullYear() === currentYear;
-        }
-      });
+          const incomeTotal = filtered
+            .filter(tx => tx.type === 'INCOME')
+            .reduce((sum, tx) => sum + tx.amount, 0);
+          const expenseTotal = filtered
+            .filter(tx => tx.type === 'EXPENSE')
+            .reduce((sum, tx) => sum + tx.amount, 0);
 
-      // Calculate totals
-      const incomeTotal = userIncomes.reduce((sum: number, income: any) => {
-        return sum + parseInt(income.amount.replace(/[^\d]/g, ''));
-      }, 0);
-
-      const expenseTotal = userExpenses.reduce((sum: number, expense: any) => {
-        return sum + parseInt(expense.amount.replace(/[^\d]/g, ''));
-      }, 0);
-
-      setTotalIncome(incomeTotal);
-      setTotalExpenses(expenseTotal);
-      setTransactionCount(userIncomes.length + userExpenses.length);
-
-      // Combine and sort transactions by creation date/time (most recent first)
-      const allTransactions: Transaction[] = [
-        ...userIncomes.map((income: any) => ({
-          ...income,
-          type: 'income' as const
-        })),
-        ...userExpenses.map((expense: any) => ({
-          ...expense,
-          type: 'expense' as const
-        }))
-      ].sort((a, b) => {
-        // Sort by createdAt timestamp (with fallback to date for old transactions)
-        const timestampA = a.createdAt ? new Date(a.createdAt).getTime() : new Date(a.date).getTime();
-        const timestampB = b.createdAt ? new Date(b.createdAt).getTime() : new Date(b.date).getTime();
-
-        // Most recent first (descending order)
-        return timestampB - timestampA;
-      });
-
-      setTransactions(allTransactions.slice(0, 15));
+          setTotalIncome(incomeTotal);
+          setTotalExpenses(expenseTotal);
+          setTransactionCount(filtered.length);
+          setTransactions(filtered.slice(0, 15));
+        })
+        .catch(console.error);
     }
   }, [user, viewMode]);
 
@@ -238,8 +202,9 @@ export function DashboardHome({ onNavigate, onCreateBudget, onCreateIncome, onCr
             ) : (
               <div className="space-y-2">
                 {transactions.map((transaction) => {
-                  const Icon = categoryIcons[transaction.categoryId] || Wallet;
-                  const isIncome = transaction.type === 'income';
+                  const categoryKey = transaction.categoryId ? dbIdToCategory[transaction.categoryId] : undefined;
+                  const Icon = categoryKey ? categoryIcons[categoryKey] || Wallet : Wallet;
+                  const isIncome = transaction.type === 'INCOME';
                   const bgColor = isIncome ? 'bg-green-100' : 'bg-orange-100';
                   const textColor = isIncome ? 'text-green-600' : 'text-orange-600';
 
@@ -253,14 +218,14 @@ export function DashboardHome({ onNavigate, onCreateBudget, onCreateIncome, onCr
                           <Icon className="w-5 h-5" strokeWidth={2} />
                         </div>
                         <div>
-                          <p className="font-medium text-slate-900 text-[15px]">{transaction.categoryName}</p>
+                          <p className="font-medium text-slate-900 text-[15px]">{transaction.description || 'Sin descripción'}</p>
                           <p className="text-slate-500 text-[13px]">
                             {transaction.description || 'Sin descripción'} • {format(new Date(transaction.date), 'dd MMM', { locale: es })}
                           </p>
                         </div>
                       </div>
                       <p className={`font-medium ${textColor} text-[17px]`}>
-                        {isIncome ? '+' : '-'}${parseInt(transaction.amount.replace(/[^\d]/g, '')).toLocaleString('es-ES')}
+                        {isIncome ? '+' : '-'}${transaction.amount.toLocaleString('es-ES')}
                       </p>
                     </div>
                   );

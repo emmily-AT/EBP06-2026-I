@@ -8,6 +8,6 @@ public final class UserMapper {
 
     public static UserDto toDto(User u) {
         if (u == null) return null;
-        return new UserDto(u.getId(), u.getUsername(), u.getFullName());
+        return new UserDto(u.getId(), u.getUsername(), u.getEmail(), u.getFullName(), u.getCurrency(), u.getRole());
     }
 }

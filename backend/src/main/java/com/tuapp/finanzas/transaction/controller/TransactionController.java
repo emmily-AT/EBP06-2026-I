@@ -6,6 +6,7 @@ import com.tuapp.finanzas.transaction.entity.Transaction.TransactionType;
 import com.tuapp.finanzas.transaction.service.TransactionService;
 import com.tuapp.finanzas.transaction.strategy.TransactionProcessor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
@@ -26,7 +27,10 @@ public class TransactionController {
 
     @GetMapping
     public ResponseEntity<List<TransactionDto>> list() {
-        return ResponseEntity.ok(transactionService.findAll());
+        var auth = SecurityContextHolder.getContext().getAuthentication();
+        User user = userLookup.findByUsername(auth.getName())
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        return ResponseEntity.ok(transactionService.findByUserId(user.getId()));
     }
 
     @GetMapping("/{id}")

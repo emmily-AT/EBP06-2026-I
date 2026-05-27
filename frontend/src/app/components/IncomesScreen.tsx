@@ -2,6 +2,8 @@ import { Plus, Briefcase, DollarSign, TrendingUp, Gift, PiggyBank, RotateCcw, Wa
 import { SidebarLayout } from './SidebarLayout';
 import { useAuth } from '../contexts/AuthContext';
 import { useState, useEffect } from 'react';
+import { transactionService } from '../api/transactionService';
+import { dbIdToCategory } from '../api/categories';
 
 const categoryIcons = {
   'salary': Briefcase,
@@ -26,13 +28,11 @@ const categoryColors = {
 };
 
 interface Income {
-  id: string;
+  id: number;
   date: string;
-  categoryId: string;
-  categoryName: string;
+  categoryId: number | null;
   description: string;
-  amount: string;
-  userId: string;
+  amount: number;
 }
 
 interface IncomesScreenProps {
@@ -46,14 +46,21 @@ export function IncomesScreen({ onNavigate, onCreateIncome, onProfileClick }: In
   const [incomes, setIncomes] = useState<Income[]>([]);
 
   useEffect(() => {
-    if (user) {
-      const allIncomes = JSON.parse(localStorage.getItem('incomes') || '[]');
-      const userIncomes = allIncomes.filter((i: Income) => i.userId === user.id);
-      // Sort by date descending
-      userIncomes.sort((a: Income, b: Income) => new Date(b.date).getTime() - new Date(a.date).getTime());
-      setIncomes(userIncomes);
-    }
-  }, [user]);
+    transactionService.getTransactions()
+      .then(res => {
+        const incomes = res.data
+          .filter((tx: any) => tx.type === 'INCOME')
+          .map((tx: any) => ({
+            id: tx.id,
+            date: tx.date,
+            categoryId: tx.categoryId,
+            description: tx.description,
+            amount: tx.amount,
+          }));
+        setIncomes(incomes);
+      })
+      .catch(console.error);
+  }, []);
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
@@ -99,8 +106,9 @@ export function IncomesScreen({ onNavigate, onCreateIncome, onProfileClick }: In
           {incomes.length > 0 && (
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 md:gap-5">
               {incomes.map((income) => {
-                const Icon = categoryIcons[income.categoryId as keyof typeof categoryIcons] || Wallet;
-                const color = categoryColors[income.categoryId as keyof typeof categoryColors] || 'bg-slate-100 text-slate-600';
+                const categoryKey = income.categoryId ? dbIdToCategory[income.categoryId] : undefined;
+                const Icon = categoryKey ? categoryIcons[categoryKey as keyof typeof categoryIcons] || Wallet : Wallet;
+                const color = categoryKey ? categoryColors[categoryKey as keyof typeof categoryColors] || 'bg-slate-100 text-slate-600' : 'bg-slate-100 text-slate-600';
 
                 return (
                   <div
@@ -113,18 +121,15 @@ export function IncomesScreen({ onNavigate, onCreateIncome, onProfileClick }: In
                         <Icon className="w-6 h-6" strokeWidth={2} />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-slate-900 font-medium truncate">{income.categoryName}</p>
+                        <p className="text-slate-900 font-medium truncate">{income.description || 'Sin descripción'}</p>
                         <p className="text-sm text-slate-500">{formatDate(income.date)}</p>
-                        {income.description && (
-                          <p className="text-xs text-slate-400 mt-1 line-clamp-2">{income.description}</p>
-                        )}
                       </div>
                     </div>
 
                     {/* Amount and Badge */}
                     <div className="flex items-center justify-between pt-3 border-t border-slate-100">
                       <span className="text-green-600 font-medium text-lg">
-                        +${income.amount}
+                        +${income.amount.toLocaleString('es-ES')}
                       </span>
                       <span className="text-xs px-2 py-1 rounded-lg bg-green-100 text-green-700">
                         Recibido

@@ -1,9 +1,12 @@
 package com.tuapp.finanzas.budget.controller;
 
 import com.tuapp.finanzas.budget.dto.BudgetDto;
+import com.tuapp.finanzas.user.entity.User;
+import com.tuapp.finanzas.user.service.UserLookup;
 import jakarta.validation.Valid;
 import com.tuapp.finanzas.budget.service.BudgetService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -13,14 +16,19 @@ import java.util.List;
 public class BudgetController {
 
     private final BudgetService budgetService;
+    private final UserLookup userLookup;
 
-    public BudgetController(BudgetService budgetService) {
+    public BudgetController(BudgetService budgetService, UserLookup userLookup) {
         this.budgetService = budgetService;
+        this.userLookup = userLookup;
     }
 
     @GetMapping
     public ResponseEntity<List<BudgetDto>> list() {
-        return ResponseEntity.ok(budgetService.findAll());
+        var auth = SecurityContextHolder.getContext().getAuthentication();
+        User user = userLookup.findByUsername(auth.getName())
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        return ResponseEntity.ok(budgetService.findByUserId(user.getId()));
     }
 
     @GetMapping("/{id}")

@@ -1,3 +1,8 @@
+package com.tuapp.finanzas.balance.dto;
+
+import java.math.BigDecimal;
+import java.util.List;
+
 public class YearlyBalanceDto {
 
     private List<MonthlySummaryDto> months;

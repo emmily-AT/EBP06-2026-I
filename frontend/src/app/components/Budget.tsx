@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { ShoppingCart, Car, Home, Film, Heart, GraduationCap, ShoppingBag, Wallet } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
+import { budgetService } from '../api/budgetService';
+import { categoryToDbId } from '../api/categories';
 
 const categories = [
   { id: 'food', name: 'Alimentación', icon: ShoppingCart, color: 'bg-orange-100 text-orange-600' },
@@ -66,19 +68,17 @@ export function Budget({ onBack }: BudgetProps) {
       setSavedCategoryName(categoryName);
       setSavedAmount(amount);
 
-      // Save budget to localStorage
-      const newBudget = {
-        id: Math.random().toString(36).substr(2, 9),
-        categoryId: selectedCategory,
-        categoryName,
-        amount,
-        month: selectedMonth,
-        userId: user?.id || ''
-      };
+      const numericAmount = parseInt(amount.replace(/[^\d]/g, ''));
+      const categoryId = categoryToDbId[selectedCategory] || undefined;
+      const year = new Date().getFullYear();
 
-      const existingBudgets = JSON.parse(localStorage.getItem('budgets') || '[]');
-      existingBudgets.push(newBudget);
-      localStorage.setItem('budgets', JSON.stringify(existingBudgets));
+      budgetService.createBudget({
+        name: categoryName,
+        limitAmount: numericAmount,
+        month: selectedMonth + 1,
+        year,
+        categoryId,
+      }).catch(console.error);
 
       setShowToast(true);
 
