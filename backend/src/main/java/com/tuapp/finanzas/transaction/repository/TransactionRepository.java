@@ -3,6 +3,7 @@ package com.tuapp.finanzas.transaction.repository;
 import com.tuapp.finanzas.transaction.entity.Transaction;
 import com.tuapp.finanzas.transaction.entity.Transaction.TransactionType;
 import java.math.BigDecimal;
+import java.time.OffsetDateTime;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -63,4 +64,10 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
 
     List<Transaction> findByUserIdOrderByDateDesc(Long userId);
 
+    List<Transaction> findByUserIdAndTypeAndDateBetweenOrderByDateDesc(
+        Long userId,
+        TransactionType type,
+        OffsetDateTime start,
+        OffsetDateTime end
+    );
 }
