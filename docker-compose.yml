@@ -1,0 +1,59 @@
+services:
+  db:
+    image: postgres:15
+    container_name: ebp06_db
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: ebp06
+    ports:
+      - "5433:5432"
+    volumes:
+      - ebp06_data:/var/lib/postgresql/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U admin -d ebp06"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 5s
+
+  backend:
+    build: ./backend
+    container_name: ebp06_backend
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
+    environment:
+      # Point the backend to the Postgres container
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/ebp06
+      SPRING_DATASOURCE_USERNAME: admin
+      SPRING_DATASOURCE_PASSWORD: admin
+      SPRING_DATASOURCE_DRIVER: org.postgresql.Driver
+      # In docker-compose we'll use Flyway to initialize schema; disable hibernate auto-ddl
+      FLYWAY_ENABLED: "true"
+      SPRING_JPA_HIBERNATE_DDL_AUTO: none
+      # Optional: ensure logs show SQL for debugging
+      SPRING_JPA_SHOW_SQL: "true"
+      # JWT secret (override in production)
+      JWT_SECRET: dev-very-secret-key-change-me-please-dev-very-secret-key
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./frontend
+      args:
+        VITE_API_URL: ""
+    container_name: EBP06_frontend
+
+    ports:
+      # host:container -> map host 3000 to nginx container port 80
+      - "3000:80"
+    restart: unless-stopped
+
+    depends_on:
+      - backend
+
+volumes:
+  ebp06_data:

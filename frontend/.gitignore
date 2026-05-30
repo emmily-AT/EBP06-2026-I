@@ -1,0 +1,7 @@
+# Vite
+dist-ssr
+
+# Editor backup files
+*.sw?
+
+.vercel

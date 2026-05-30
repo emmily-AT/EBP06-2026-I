@@ -1,0 +1,27 @@
+spring:
+  datasource:
+    # Allow overriding the datasource via env vars (for docker / prod). Fallback to H2 for dev.
+    url: ${SPRING_DATASOURCE_URL:jdbc:h2:mem:finanzasdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE}
+    username: ${SPRING_DATASOURCE_USERNAME:sa}
+    password: ${SPRING_DATASOURCE_PASSWORD:}
+    driver-class-name: ${SPRING_DATASOURCE_DRIVER:org.h2.Driver}
+  jpa:
+    hibernate:
+      # Keep update for local dev, but in docker-compose we'll set ddl-auto to none and rely on Flyway
+      ddl-auto: ${SPRING_JPA_HIBERNATE_DDL_AUTO:update}
+    show-sql: ${SPRING_JPA_SHOW_SQL:true}
+    database-platform: ${SPRING_JPA_DATABASE_PLATFORM:org.hibernate.dialect.H2Dialect}
+    defer-datasource-initialization: true
+  flyway:
+    enabled: ${FLYWAY_ENABLED:false}
+  sql:
+    init:
+      mode: ${SPRING_SQL_INIT_MODE:embedded}
+
+server:
+  port: ${PORT:8080}
+
+jwt:
+  # For dev only. Override with env var JWT_SECRET in production.
+  secret: ${JWT_SECRET:dev-very-secret-key-change-me-please-dev-very-secret-key}
+  expiration-ms: 3600000 # 1 hour

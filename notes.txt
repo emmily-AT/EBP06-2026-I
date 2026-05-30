@@ -1,0 +1,14 @@
+
+Actualizar Cambios
+git add .
+git commit -m "nombreCommit"
+git push
+
+Para Nuevas Tareas:
+git checkout develop
+git pull
+
+git checkout -b feature/nombre-feature
+
+Trabajar -> luego
+git push -u origin feature/nombre-feature

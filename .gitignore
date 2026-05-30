@@ -1,0 +1,95 @@
+# ========================
+# OS generated files
+# ========================
+.DS_Store
+.DS_Store?
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# ========================
+# IDE / Editor
+# ========================
+.idea/
+*.iml
+*.iws
+*.ipr
+.vscode/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+out/
+.claude/**
+
+# ========================
+# Java / Maven
+# ========================
+*.class
+*.log
+*.ctxt
+.mtj.tmp/
+hs_err_pid*
+replay_pid*
+
+*.jar
+*.war
+*.nar
+*.ear
+*.zip
+*.tar.gz
+*.rar
+
+target/
+*.jar.original
+
+# ========================
+# Node.js / Frontend
+# ========================
+node_modules/
+dist/
+dist-ssr/
+
+# ========================
+# Environment / Secrets
+# ========================
+.env
+.env.local
+.env.*.local
+*.local
+
+# ========================
+# Logs
+# ========================
+logs/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# ========================
+# Eclipse / STS
+# ========================
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings/
+.springBeans
+.sts4-cache
+
+# ========================
+# Gradle (if ever used)
+# ========================
+.gradle
+build/
+
+# ========================
+# NetBeans
+# ========================
+/nbproject/private/
+/nbbuild/
+/nbdist/
+/.nb-gradle/
