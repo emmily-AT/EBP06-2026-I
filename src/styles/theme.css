@@ -1,0 +1,720 @@
+@custom-variant dark (&:is(.dark *));
+
+:root {
+  --font-size: 16px;
+  --background: #ffffff;
+  --foreground: oklch(0.145 0 0);
+  --card: #ffffff;
+  --card-foreground: oklch(0.145 0 0);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.145 0 0);
+  --primary: #030213;
+  --primary-foreground: oklch(1 0 0);
+  --secondary: oklch(0.95 0.0058 264.53);
+  --secondary-foreground: #030213;
+  --muted: #ececf0;
+  --muted-foreground: #717182;
+  --accent: #e9ebef;
+  --accent-foreground: #030213;
+  --destructive: #d4183d;
+  --destructive-foreground: #ffffff;
+  --border: rgba(0, 0, 0, 0.1);
+  --input: transparent;
+  --input-background: #f3f3f5;
+  --switch-background: #cbced4;
+  --font-weight-medium: 500;
+  --font-weight-normal: 400;
+  --ring: #4C1D95;
+  --chart-1: oklch(0.646 0.222 41.116);
+  --chart-2: oklch(0.6 0.118 184.704);
+  --chart-3: oklch(0.398 0.07 227.392);
+  --chart-4: oklch(0.828 0.189 84.429);
+  --chart-5: oklch(0.769 0.188 70.08);
+  --radius: 0.625rem;
+  --sidebar: oklch(0.985 0 0);
+  --sidebar-foreground: oklch(0.145 0 0);
+  --sidebar-primary: #030213;
+  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-accent: oklch(0.97 0 0);
+  --sidebar-accent-foreground: oklch(0.205 0 0);
+  --sidebar-border: oklch(0.922 0 0);
+  --sidebar-ring: oklch(0.708 0 0);
+}
+
+.dark {
+  --background: oklch(0.145 0 0);
+  --foreground: oklch(0.985 0 0);
+  --card: oklch(0.145 0 0);
+  --card-foreground: oklch(0.985 0 0);
+  --popover: oklch(0.145 0 0);
+  --popover-foreground: oklch(0.985 0 0);
+  --primary: oklch(0.985 0 0);
+  --primary-foreground: oklch(0.205 0 0);
+  --secondary: oklch(0.269 0 0);
+  --secondary-foreground: oklch(0.985 0 0);
+  --muted: oklch(0.269 0 0);
+  --muted-foreground: oklch(0.708 0 0);
+  --accent: oklch(0.269 0 0);
+  --accent-foreground: oklch(0.985 0 0);
+  --destructive: oklch(0.396 0.141 25.723);
+  --destructive-foreground: oklch(0.637 0.237 25.331);
+  --border: oklch(0.269 0 0);
+  --input: oklch(0.269 0 0);
+  --ring: oklch(0.439 0 0);
+  --font-weight-medium: 500;
+  --font-weight-normal: 400;
+  --chart-1: oklch(0.488 0.243 264.376);
+  --chart-2: oklch(0.696 0.17 162.48);
+  --chart-3: oklch(0.769 0.188 70.08);
+  --chart-4: oklch(0.627 0.265 303.9);
+  --chart-5: oklch(0.645 0.246 16.439);
+  --sidebar: oklch(0.205 0 0);
+  --sidebar-foreground: oklch(0.985 0 0);
+  --sidebar-primary: oklch(0.488 0.243 264.376);
+  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-accent: oklch(0.269 0 0);
+  --sidebar-accent-foreground: oklch(0.985 0 0);
+  --sidebar-border: oklch(0.269 0 0);
+  --sidebar-ring: oklch(0.439 0 0);
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-input-background: var(--input-background);
+  --color-switch-background: var(--switch-background);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+  }
+
+  /**
+  * Default typography styles for HTML elements (h1-h4, p, label, button, input).
+  * These are in @layer base, so Tailwind utility classes (like text-sm, text-lg) automatically override them.
+  */
+
+  html {
+    font-size: var(--font-size);
+  }
+
+  h1 {
+    font-size: var(--text-2xl);
+    font-weight: var(--font-weight-medium);
+    line-height: 1.5;
+  }
+
+  h2 {
+    font-size: var(--text-xl);
+    font-weight: var(--font-weight-medium);
+    line-height: 1.5;
+  }
+
+  h3 {
+    font-size: var(--text-lg);
+    font-weight: var(--font-weight-medium);
+    line-height: 1.5;
+  }
+
+  h4 {
+    font-size: var(--text-base);
+    font-weight: var(--font-weight-medium);
+    line-height: 1.5;
+  }
+
+  label {
+    font-size: var(--text-base);
+    font-weight: var(--font-weight-medium);
+    line-height: 1.5;
+  }
+
+  button {
+    font-size: var(--text-base);
+    font-weight: var(--font-weight-medium);
+    line-height: 1.5;
+  }
+
+  input {
+    font-size: var(--text-base);
+    font-weight: var(--font-weight-normal);
+    line-height: 1.5;
+  }
+
+  /* Responsive base adjustments */
+  @media (max-width: 390px) {
+    html {
+      font-size: 15px; /* Slightly smaller for very small screens */
+    }
+  }
+
+  @media (min-width: 768px) {
+    html {
+      font-size: 16px; /* Standard for tablet and up */
+    }
+  }
+
+  @media (min-width: 1280px) {
+    html {
+      font-size: 16px; /* Maintain for desktop */
+    }
+  }
+}
+
+/* Toast Animations */
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    transform: scale(0);
+  }
+  to {
+    transform: scale(1);
+  }
+}
+
+@keyframes drawCheck {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes fadeSlideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-slide-down {
+  animation: slideDown 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.animate-scale-in {
+  animation: scaleIn 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.animate-check-draw {
+  animation: drawCheck 0.5s ease-out 0.2s forwards;
+}
+
+.animate-fade-slide-down {
+  animation: fadeSlideDown 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Accessibility: Font Size Adjustments */
+body.font-size-normal {
+  --font-size: 16px;
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-base: 1rem;
+  --text-lg: 1.125rem;
+  --text-xl: 1.25rem;
+  --text-2xl: 1.5rem;
+}
+
+body.font-size-large {
+  --font-size: 18px;
+  --text-xs: 0.8125rem;
+  --text-sm: 0.9375rem;
+  --text-base: 1.0625rem;
+  --text-lg: 1.1875rem;
+  --text-xl: 1.3125rem;
+  --text-2xl: 1.5625rem;
+}
+
+body.font-size-xlarge {
+  --font-size: 20px;
+  --text-xs: 0.875rem;
+  --text-sm: 1rem;
+  --text-base: 1.125rem;
+  --text-lg: 1.25rem;
+  --text-xl: 1.375rem;
+  --text-2xl: 1.625rem;
+}
+
+/* ============================================
+   ACCESSIBILITY: HIGH CONTRAST MODE (WCAG AAA)
+   ============================================
+
+   Palette:
+   - Background: #000000 (Pure Black)
+   - Surfaces: #121212 (Dark Gray)
+   - Text: #FFFFFF (Pure White)
+   - Borders: #FFFFFF (White, visible)
+   - Active Buttons: #FFFF00 (Yellow) with black text
+   - Links: #00FFFF (Cyan)
+   - Focus/Hover: Clear visual indicators
+
+   All contrast ratios meet WCAG AAA standards (7:1 minimum)
+   ============================================ */
+
+body.high-contrast {
+  /* Core color variables */
+  --background: #000000;
+  --foreground: #FFFFFF;
+  --card: #121212;
+  --card-foreground: #FFFFFF;
+  --border: #FFFFFF;
+  --input-background: #121212;
+  --ring: #FFFF00;
+
+  /* Remove all shadows for clarity */
+  --shadow: none;
+}
+
+/* ===== BASE BACKGROUNDS ===== */
+body.high-contrast .bg-\[\#F7F5F0\],
+body.high-contrast .bg-\[\#F0F2F5\] {
+  background-color: #000000 !important;
+  color: #FFFFFF !important;
+}
+
+/* Tarjetas y superficies elevadas */
+body.high-contrast .bg-white {
+  background-color: #121212 !important;
+  border: 2px solid #FFFFFF !important;
+}
+
+body.high-contrast .bg-slate-50,
+body.high-contrast .bg-slate-100 {
+  background-color: #121212 !important;
+}
+
+/* ===== PRIMARY COLORS (Purple brand) ===== */
+body.high-contrast .bg-\[\#3D2C8D\],
+body.high-contrast .bg-\[\#4c1d95\] {
+  background-color: #121212 !important;
+  border: 2px solid #FFFFFF !important;
+}
+
+body.high-contrast .text-\[\#3D2C8D\],
+body.high-contrast .text-\[\#4C1D95\] {
+  color: #FFFFFF !important;
+}
+
+/* ===== ACCENT COLORS (Yellow/Gold) ===== */
+body.high-contrast .bg-\[\#FFD200\],
+body.high-contrast .bg-\[\#F2B233\],
+body.high-contrast .bg-yellow-400 {
+  background-color: #FFFF00 !important;
+  color: #000000 !important;
+  border: 2px solid #000000 !important;
+}
+
+body.high-contrast .bg-\[\#FFD200\] *,
+body.high-contrast .bg-\[\#F2B233\] *,
+body.high-contrast .bg-yellow-400 * {
+  color: #000000 !important;
+}
+
+body.high-contrast .text-\[\#FFD200\],
+body.high-contrast .text-yellow-400 {
+  color: #FFFF00 !important;
+}
+
+/* ===== TEXT COLORS ===== */
+body.high-contrast .text-slate-500,
+body.high-contrast .text-slate-600,
+body.high-contrast .text-slate-700,
+body.high-contrast .text-slate-800,
+body.high-contrast .text-slate-900,
+body.high-contrast .text-\[\#7B6FA0\],
+body.high-contrast .text-\[\#8c86a0\],
+body.high-contrast .text-\[\#314158\],
+body.high-contrast .text-black,
+body.high-contrast .text-gray-900,
+body.high-contrast .text-gray-800,
+body.high-contrast .text-gray-700,
+body.high-contrast .text-gray-600 {
+  color: #FFFFFF !important;
+}
+
+/* Override all text elements */
+body.high-contrast span:not(.bg-\[\#FFFF00\] *),
+body.high-contrast p,
+body.high-contrast h1,
+body.high-contrast h2,
+body.high-contrast h3,
+body.high-contrast h4,
+body.high-contrast h5,
+body.high-contrast h6,
+body.high-contrast label {
+  color: #FFFFFF !important;
+}
+
+/* ===== BORDERS ===== */
+body.high-contrast .border-\[\#D8D0F0\],
+body.high-contrast .border-slate-100,
+body.high-contrast .border-slate-200,
+body.high-contrast .border-slate-300 {
+  border-color: #FFFFFF !important;
+  border-width: 2px !important;
+}
+
+/* ===== LINKS ===== */
+body.high-contrast a {
+  color: #00FFFF !important; /* Cyan for links */
+  text-decoration: underline !important;
+}
+
+body.high-contrast a:hover {
+  color: #FFFF00 !important; /* Yellow on hover */
+  text-decoration: underline !important;
+  background-color: rgba(255, 255, 0, 0.1) !important;
+}
+
+body.high-contrast a:focus-visible {
+  outline: 3px solid #FFFF00 !important;
+  outline-offset: 2px;
+}
+
+/* ===== BUTTONS ===== */
+body.high-contrast button {
+  border: 2px solid #FFFFFF !important;
+  color: #FFFFFF !important;
+  background-color: #121212 !important;
+}
+
+/* Primary/Active buttons */
+body.high-contrast button.bg-\[\#3D2C8D\],
+body.high-contrast button.bg-\[\#4c1d95\],
+body.high-contrast button.bg-\[\#0D0D0D\],
+body.high-contrast button[class*="bg-primary"] {
+  background-color: #FFFF00 !important; /* Yellow for primary actions */
+  color: #000000 !important;
+  border: 2px solid #000000 !important;
+}
+
+/* Button hover states */
+body.high-contrast button:hover:not(:disabled) {
+  background-color: #FFFF00 !important;
+  color: #000000 !important;
+  border-color: #000000 !important;
+}
+
+/* Button focus states */
+body.high-contrast button:focus-visible {
+  outline: 3px solid #FFFF00 !important;
+  outline-offset: 3px;
+  outline-style: solid;
+}
+
+/* Disabled buttons */
+body.high-contrast button:disabled,
+body.high-contrast button[disabled] {
+  background-color: #333333 !important;
+  color: #666666 !important;
+  border-color: #666666 !important;
+  cursor: not-allowed !important;
+  opacity: 0.5;
+}
+
+/* ===== INPUT FIELDS ===== */
+body.high-contrast input,
+body.high-contrast select,
+body.high-contrast textarea {
+  background-color: #121212 !important;
+  border: 2px solid #FFFFFF !important;
+  color: #FFFFFF !important;
+}
+
+body.high-contrast input::placeholder,
+body.high-contrast textarea::placeholder {
+  color: #AAAAAA !important;
+}
+
+body.high-contrast input:focus,
+body.high-contrast select:focus,
+body.high-contrast textarea:focus {
+  outline: 3px solid #FFFF00 !important;
+  outline-offset: 2px;
+  border-color: #FFFF00 !important;
+}
+
+/* ===== NAVIGATION (Sidebar & Bottom Nav) ===== */
+body.high-contrast nav,
+body.high-contrast aside {
+  background-color: #000000 !important;
+  border-color: #FFFFFF !important;
+}
+
+/* Nav items default */
+body.high-contrast nav a,
+body.high-contrast nav button,
+body.high-contrast aside a,
+body.high-contrast aside button {
+  color: #FFFFFF !important;
+  border: 2px solid transparent !important;
+}
+
+/* Nav items hover */
+body.high-contrast nav a:hover,
+body.high-contrast nav button:hover,
+body.high-contrast aside a:hover,
+body.high-contrast aside button:hover {
+  background-color: #121212 !important;
+  color: #FFFF00 !important;
+  border: 2px solid #FFFF00 !important;
+}
+
+/* Nav items active/selected */
+body.high-contrast nav a[aria-current],
+body.high-contrast nav button[aria-current],
+body.high-contrast nav .bg-\[\#FFD200\],
+body.high-contrast aside .bg-\[\#FFD200\] {
+  background-color: #FFFF00 !important;
+  color: #000000 !important;
+  border: 2px solid #000000 !important;
+}
+
+/* Texto e iconos dentro de botones activos del sidebar */
+body.high-contrast nav a[aria-current] *,
+body.high-contrast nav button[aria-current] *,
+body.high-contrast nav .bg-\[\#FFD200\] *,
+body.high-contrast aside .bg-\[\#FFD200\] * {
+  color: #000000 !important;
+}
+
+body.high-contrast nav a[aria-current] svg,
+body.high-contrast nav button[aria-current] svg,
+body.high-contrast nav .bg-\[\#FFD200\] svg,
+body.high-contrast aside .bg-\[\#FFD200\] svg {
+  stroke: #000000 !important;
+  fill: #000000 !important;
+}
+
+/* ===== CARDS & SURFACES ===== */
+body.high-contrast .rounded-2xl,
+body.high-contrast .rounded-xl {
+  background-color: #121212 !important;
+  border: 2px solid #FFFFFF !important;
+}
+
+/* ===== SEMANTIC COLORS ===== */
+
+/* Success/Income (Green) */
+body.high-contrast .text-green-600,
+body.high-contrast .text-green-500,
+body.high-contrast .text-green-300,
+body.high-contrast .bg-green-500,
+body.high-contrast .bg-green-100 {
+  color: #00FF00 !important; /* Pure green for max contrast */
+  background-color: #121212 !important;
+}
+
+/* Error/Expense (Red) */
+body.high-contrast .text-red-600,
+body.high-contrast .text-red-700,
+body.high-contrast .text-red-500,
+body.high-contrast .bg-red-500,
+body.high-contrast .bg-red-100,
+body.high-contrast .bg-red-50 {
+  color: #FF0000 !important; /* Pure red for max contrast */
+  background-color: #121212 !important;
+}
+
+/* ===== GRADIENTS ===== */
+body.high-contrast [class*="gradient"],
+body.high-contrast [class*="from-"],
+body.high-contrast [class*="to-"] {
+  background-image: none !important;
+  background-color: #121212 !important;
+}
+
+/* ===== SHADOWS (Remove all) ===== */
+body.high-contrast * {
+  box-shadow: none !important;
+  text-shadow: none !important;
+}
+
+/* ===== FOCUS INDICATORS ===== */
+body.high-contrast *:focus-visible {
+  outline: 3px solid #FFFF00 !important;
+  outline-offset: 2px;
+}
+
+/* ===== SELECTION ===== */
+body.high-contrast ::selection {
+  background-color: #FFFF00 !important;
+  color: #000000 !important;
+}
+
+/* ===== ICONS ===== */
+body.high-contrast svg {
+  stroke: currentColor !important;
+  fill: currentColor !important;
+}
+
+/* ===== ACCESSIBILITY BUTTON ===== */
+body.high-contrast .fixed[class*="bottom"] button {
+  background-color: #FFFF00 !important;
+  color: #000000 !important;
+  border: 3px solid #000000 !important;
+}
+
+body.high-contrast .fixed[class*="bottom"] button:hover {
+  background-color: #00FFFF !important;
+  color: #000000 !important;
+}
+
+/* ===== NOTIFICATIONS & BADGES ===== */
+body.high-contrast .bg-amber-50,
+body.high-contrast .bg-blue-100,
+body.high-contrast .bg-orange-100 {
+  background-color: #121212 !important;
+  border: 2px solid #FFFF00 !important;
+}
+
+/* ===== DIVIDERS ===== */
+body.high-contrast hr,
+body.high-contrast .border-b,
+body.high-contrast .border-t {
+  border-color: #FFFFFF !important;
+  border-width: 2px !important;
+}
+
+/* ===== PROFILE CARD & SPECIAL ELEMENTS ===== */
+body.high-contrast .bg-\[\#FFD200\] {
+  background-color: #FFFF00 !important;
+  color: #000000 !important;
+}
+
+/* ===== HOVER STATES (General) ===== */
+body.high-contrast [class*="hover:bg-"]:hover {
+  background-color: #FFFF00 !important;
+  color: #000000 !important;
+}
+
+/* ===== MODAL OVERLAYS ===== */
+body.high-contrast .fixed.inset-0[class*="bg-black"] {
+  background-color: rgba(0, 0, 0, 0.95) !important;
+}
+
+/* ===== CHART COLORS (For financial charts) ===== */
+body.high-contrast [class*="fill-"],
+body.high-contrast [class*="stroke-"] {
+  fill: #FFFFFF !important;
+  stroke: #FFFFFF !important;
+}
+
+/* ===== ENSURE WHITE TEXT ON DARK BACKGROUNDS ===== */
+body.high-contrast .bg-\[\#121212\] *,
+body.high-contrast .bg-black * {
+  color: #FFFFFF !important;
+}
+
+/* ===== ACTIVE STATES ===== */
+body.high-contrast [aria-pressed="true"],
+body.high-contrast [aria-selected="true"],
+body.high-contrast [aria-checked="true"] {
+  background-color: #FFFF00 !important;
+  color: #000000 !important;
+  border: 2px solid #000000 !important;
+}
+
+/* ===== DIVIDERS Y SEPARADORES ===== */
+
+body.high-contrast .divide-y > * {
+  border-color: #FFFFFF !important;
+  border-width: 2px !important;
+}
+
+/* ===== CHARTS Y VISUALIZACIONES ===== */
+
+body.high-contrast [class*="fill-"],
+body.high-contrast [class*="stroke-"] {
+  fill: #FFFFFF !important;
+  stroke: #FFFFFF !important;
+}
+
+/* ===== NOTIFICACIONES Y BADGES ===== */
+
+body.high-contrast .bg-amber-50,
+body.high-contrast .bg-yellow-50 {
+  background-color: #121212 !important;
+  border: 2px solid #FFFF00 !important;
+  color: #FFFFFF !important;
+}
+
+/* ===== ASEGURAR CONTRASTE EN ELEMENTOS ESPECÍFICOS ===== */
+
+/* Texto sobre fondos oscuros siempre blanco */
+body.high-contrast .bg-\[\#000000\] *,
+body.high-contrast .bg-\[\#121212\] *,
+body.high-contrast .bg-black * {
+  color: #FFFFFF !important;
+}
+
+/* Texto sobre amarillo siempre negro */
+body.high-contrast .bg-\[\#FFFF00\] *,
+body.high-contrast [style*="background-color: rgb(255, 255, 0)"] * {
+  color: #000000 !important;
+}
+
+/* ===== PERFIL Y ELEMENTOS ESPECIALES ===== */
+
+/* Avatar con fondo amarillo */
+body.high-contrast .bg-\[\#FFD200\] {
+  background-color: #FFFF00 !important;
+  color: #000000 !important;
+}
+
+/* ===== ESTADOS DE CARGA ===== */
+
+body.high-contrast .animate-pulse {
+  animation: none !important;
+  background-color: #121212 !important;
+  border: 2px dashed #FFFFFF !important;
+}
